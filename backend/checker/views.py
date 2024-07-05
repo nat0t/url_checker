@@ -10,9 +10,10 @@ from checker.serializers import LinkListRetrieveSerializer, LinkCreateUpdateSeri
 
 logger = getLogger('checker')
 
+
 class LinkViewSet(ModelViewSet):
     """Controller for processing links."""
-    http_method_names = ('get', 'post', 'patch', 'delete')
+    http_method_names = ('get', 'post', 'put', 'delete')
 
     def get_queryset(self):
         return Link.objects.filter(user=self.request.user)
@@ -42,20 +43,13 @@ class LinkViewSet(ModelViewSet):
         self.validate_ids(ids)
         links = []
         for link_data in request.data:
-            link = self.get_object(link_data.get('id'))
+            link = Link.objects.get(id=link_data.get('id'))
             link.url = link_data.get('url')
             links.append(link)
         Link.objects.bulk_update(links, ['url'])
         serializer = LinkCreateUpdateSerializer(links, many=True)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status.HTTP_200_OK, headers=headers)
-
-    def get_object(self, obj_id):
-        try:
-            return Link.objects.get(id=obj_id)
-        except (Link.DoesNotExist, ValidationError):
-            logger.error(f'Link with id={obj_id} not found.')
-            raise status.HTTP_400_BAD_REQUEST
 
     def validate_ids(self, ids):
         for id in ids:

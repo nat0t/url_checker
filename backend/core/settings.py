@@ -27,7 +27,7 @@ SECRET_KEY = local_settings.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -157,13 +157,13 @@ LOGGING = {
     },
     'handlers': {
         'accounts_file': {
-            'level': 'DEBUG',
+            'level': local_settings.LOG_LEVEL,
             'class': 'logging.FileHandler',
             'filename': f'{BASE_DIR.joinpath("logs").joinpath("accounts.log")}',
             'formatter': 'default',
         },
         'checker_file': {
-            'level': 'DEBUG',
+            'level': local_settings.LOG_LEVEL,
             'class': 'logging.FileHandler',
             'filename': f'{BASE_DIR.joinpath("logs").joinpath("checker.log")}',
             'formatter': 'default',
@@ -172,12 +172,12 @@ LOGGING = {
     'loggers': {
         'accounts': {
             'handlers': ['accounts_file'],
-            'level': 'DEBUG',
+            'level': local_settings.LOG_LEVEL,
             'propagate': True,
         },
         'checker': {
             'handlers': ['checker_file'],
-            'level': 'DEBUG',
+            'level': local_settings.LOG_LEVEL,
             'propagate': True,
         },
     },

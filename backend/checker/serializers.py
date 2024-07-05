@@ -6,7 +6,7 @@ from checker.models import Link
 class LinkListRetrieveSerializer(ModelSerializer):
     class Meta:
         model = Link
-        fields = ('id', 'url', 'status_code', 'color')
+        fields = ('id', 'url', 'status_code')
 
 
 class LinkCreateUpdateSerializer(ModelSerializer):
