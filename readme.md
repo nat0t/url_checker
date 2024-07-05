@@ -8,4 +8,6 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 - собрать и запустить контейнеры командой из корня проекта
-```docker-compose up --build```
+```
+docker-compose up --build
+```
