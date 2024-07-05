@@ -9,8 +9,10 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+import os
 from pathlib import Path
+
+from core import local_settings
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*i$nx6)$197ewd)2(z2nst*r%z4(pslnhkz480j440e46fya#9'
+SECRET_KEY = local_settings.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -31,12 +33,18 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # Built-in apps.
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Third-party apps.
+    'rest_framework',
+    # Our apps.
+    'accounts',
+    'checker',
 ]
 
 MIDDLEWARE = [
@@ -76,7 +84,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR.parent.joinpath('db').joinpath('db.sqlite3'),
     }
 }
 
@@ -116,8 +124,65 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'accounts.CustomUser'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'
+    ]
+}
+
+
+try:
+    os.makedirs(BASE_DIR.joinpath('logs'))    # Create "logs" directory if not exists
+except FileExistsError:
+    pass
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': '{levelname}, {asctime}, {module}, {process:d}/{thread:d} - {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'accounts_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': f'{BASE_DIR.joinpath("logs").joinpath("accounts.log")}',
+            'formatter': 'default',
+        },
+        'checker_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': f'{BASE_DIR.joinpath("logs").joinpath("checker.log")}',
+            'formatter': 'default',
+        },
+    },
+    'loggers': {
+        'accounts': {
+            'handlers': ['accounts_file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'checker': {
+            'handlers': ['checker_file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
+
+CELERY_BROKER_URL = local_settings.CELERY_BROKER_URL
+CELERY_RESULT_BACKEND = local_settings.CELERY_RESULT_BACKEND
