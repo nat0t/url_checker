@@ -7,6 +7,10 @@ ____
 python manage.py makemigrations
 python manage.py migrate
 ```
+- переименовать файл .env.sample в .env и изменить в нём значения на необходимые
+```
+mv .env.sample .env
+```
 - собрать и запустить контейнеры командой из корня проекта
 ```
 docker-compose up --build
