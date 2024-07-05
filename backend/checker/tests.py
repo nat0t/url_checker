@@ -40,6 +40,21 @@ class LinkTest(APITestCase):
         )
         assert response.status_code == 201
 
+    def test_update_links(self):
+        self.client.force_authenticate(user=self.user)
+        mixer.blend('checker.Link')
+        mixer.blend('checker.Link')
+        response = self.client.put(
+            'http://127.0.0.1/api/checker/',
+            {
+                'links': [
+                    {'id': 1, 'url': self.link.url},
+                    {'id': 2, 'url': self.link.url},
+                ],
+            }
+        )
+        assert response.status_code == 200
+
     def test_delete_link(self):
         self.client.force_authenticate(user=self.link.user)
         response = self.client.delete(f'http://127.0.0.1/api/checker/{self.link.id}/')

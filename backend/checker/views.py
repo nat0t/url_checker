@@ -13,7 +13,7 @@ logger = getLogger('checker')
 
 class LinkViewSet(ModelViewSet):
     """Controller for processing links."""
-    http_method_names = ('get', 'post', 'put', 'delete')
+    http_method_names = ('get', 'post', 'head', 'put', 'delete')
 
     def get_queryset(self):
         return Link.objects.filter(user=self.request.user)
@@ -38,13 +38,14 @@ class LinkViewSet(ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-    def update(self, request, *args, **kwargs):
-        ids = [link.get('id') for link in request.data]
+    def put(self, request, *args, **kwargs):
+        ids = [eval(link).get('id') for link in request.data.values()]
         self.validate_ids(ids)
         links = []
-        for link_data in request.data:
-            link = Link.objects.get(id=link_data.get('id'))
-            link.url = link_data.get('url')
+        for link_data in request.data.values():
+            link_data_ = eval(link_data)
+            link = Link.objects.get(id=link_data_.get('id'))
+            link.url = link_data_.get('url')
             links.append(link)
         Link.objects.bulk_update(links, ['url'])
         serializer = LinkCreateUpdateSerializer(links, many=True)
