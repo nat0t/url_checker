@@ -18,5 +18,7 @@ docker-compose up --build
 ```
 ## API
 API приложения доступно по ссылке /api/
+
 Работа с пользователями (доступны методы GET, POST, DELETE): /api/users/
+
 Работа со ссылками (доступны методы GET, POST, PUT, DELETE): /api/checker/
